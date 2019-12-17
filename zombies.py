@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Oct  8 13:24:46 2019
-
 @author: gy15cep
-Student number 200931617
+
+Notes
+Day 1 - renamed zombies and humans, removed irrelevant functions from framework,
+    incorporated a runtype component into zombies to determine if theyre crawlers, walkers or runners!
+Day 2 - convert humans to zombies 
+
+Things to add in:
+human zombie altercation
+human decides to attack or run?
+randomly spanwing weapons? button?
+human food and shelter?
+zombie view (smaller than human)
+humans stay together?
 """
-
-
 #importing libraries
 import matplotlib
 matplotlib.use('TkAgg')
@@ -15,9 +24,8 @@ import matplotlib.animation
 import tkinter
 import agentframework
 
-#define number of iterations and neighbourhood size
+#define number of iterations
 num_of_iterations = 1000
-neighbourhood = 20 #single number variable defining the distance in which agents can run the share_with_neighbour function.
 
 def setup(): 
     """
@@ -36,20 +44,22 @@ def setup():
     
     #create agent lists, declate as global variables
     global zombies
-    zombies = [] #list, then populated using the wolf class of agent framework.
+    zombies = [] #list, then populated using the zombie class of agent framework.
     global humans
     humans = [] #list, then populated using the humans class of agent framework.
+
     
-    #initialise agents, feeding in relevant variables (e.g. html x and y, environment) to the humans and wolf classes
+    #initialise agents
     #creates lists of agents with variables defined in agentframework module
     for i in range(num_of_humans):
-        humans.append(agentframework.Human(zombies, humans, neighbourhood))
+        humans.append(agentframework.Human(zombies, humans))
         
     for i in range(num_of_zombies): 
-        create_zombie()
-
-def create_zombie():
-    zombies.append(agentframework.Zombie(humans))
+        xlist = [0,10]
+        ylist = [250,275]
+        x = int(xlist[i])
+        y = int(ylist[i])
+        zombies.append(agentframework.Zombie(zombies, humans,x,y))
 
 
 carry_on = True
@@ -77,6 +87,7 @@ def update(frame_number):
     for i in range(len(zombies)): 
             zombies[i].chase()
             zombies[i].eat()
+            #print(zombies[i].strength)
             #if there are no more humans, stop the model via the generator function
             if len(humans) == 0:
                 carry_on = False
@@ -85,8 +96,10 @@ def update(frame_number):
             
     #humans behaviours
     #humans agent list populated by humans class in agentframework. 
+    #print (len(humans))
     for i in range(len(humans)): 
             humans[i].move()
+            
     
     #plot agents on GUI graph/animation        
     for i in range(len(humans)):
