@@ -3,13 +3,13 @@ import random
 
 #create agents and define their behaviours
 class Agent() :
-    def __init__ (self,zombies,humans,neighbourhood):
+    def __init__ (self,zombies,humans):
         """
         Function to initiate the agent, sets x, y and store, feeds in environment, humans and zombies lists, neighbourhood from model.
         If there are no more x and y variables to ude form the html, it assigns random ones.
         Params:
             environment - environment list of lists from model.
-            zombies - wolf class agent list
+            zombies - zombie class agent list
             humans - humans class agent list
             neighbourhood - neighbourhood variable from model.
             y - y variable from html in model.
@@ -21,7 +21,6 @@ class Agent() :
         #read in lists
         self.humans = humans
         self.zombies = zombies
-        self.neighbourhood = neighbourhood
         self.strength = random.randint(1,5)
           
     def fence_halt(self):
@@ -117,7 +116,7 @@ class Human(Agent):
             self.fence_halt()
            
 class Zombie(Agent):
-    def __init__ (self,humans):
+    def __init__ (self,zombies,humans,x,y):
         """
         Function to initiate wolf, sets x, y and store, feeds in humans list from model.
         
@@ -129,10 +128,13 @@ class Zombie(Agent):
             y - y variable from html in model.
             x - x variable from html in model.
         """
-        self.y = random.randint(0,49)
-        self.x = random.randint(250,299)
+        if (y == None): self._y = random.randint(0,49) 
+        else: self.y = y
+        if (x == None): self._x = random.randint(250,299)
+        else: self.x = x
         self.humans = humans
-        self.runtype = random.randint(1,3)
+        self.zombies = zombies
+        self.type = random.randint(1,3) #1 is crawler, 2 is walker, 3 is runner
         
     def chase(self):
         """
@@ -151,7 +153,7 @@ class Zombie(Agent):
             human_dist.append([distance,self.humans[i].x,self.humans[i].y],)
         human_dist.sort()
         self.closest_agent = [human_dist[0][1],human_dist[0][2], human_dist[0][0]]  
-        self.move_speed = 2 * self.runtype
+        self.move_speed = 2 * self.type
         self.move_towards()
         self.fence_halt()
          
@@ -169,8 +171,28 @@ class Zombie(Agent):
         """
         if len(self.humans) > 0:
             if self.closest_agent[2] < 10: #if distance of closest prey is less than 20
-                for humans in self.humans: #for every humans in humans list
-                    if humans.x == self.closest_agent[0] and humans.y == self.closest_agent[1]:
-                        self.humans.remove(humans)
-                        #create_zombie()
+                for human in self.humans: #for every humans in humans list
+                    if human.x == self.closest_agent[0] and human.y == self.closest_agent[1]:
+                        human_x = human.x
+                        human_y = human.y
+                        self.zombies.append(Zombie(self.zombies,self.humans,human_x,human_y))
+                        self.humans.remove(human)
+                        
+    def attack(self):
+        """
+        function for zombies to attack human, and eat if they win
+        
+        Params:
+            humans - humans class agent list (containing x and y of each).
+            closest_agent - list containing x, y and distance between self and closest humans.
+            store - variable representing food storage in agent.
+        """
+        if len(self.humans) > 0:
+            if self.closest_agent[2] < 10: #if distance of closest prey is less than 10
+                for human in self.humans: #for every humans in humans list
+                    if human.x == self.closest_agent[0] and human.y == self.closest_agent[1]:
+                        pass
+                
+
+                        
                         
